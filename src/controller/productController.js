@@ -2,6 +2,7 @@ const productModel = require('../models/productModel');
 const s3link = require('../cloud link/s3link')
 const mongoose=require('mongoose')
 
+// .......................Validation Functions..............................................................
 
 const isValid = function (value) {
     if (typeof value == undefined || value == null) return false
@@ -26,6 +27,8 @@ const isValidObjectId = function (objectId) {
 };
 
 
+// ............................Fifth Api Product Creation..................................................
+
 const createProduct = async function(req,res){
     try {
          data = req.body
@@ -35,7 +38,11 @@ const createProduct = async function(req,res){
             return res.status(400).send({status:false,message:'Please provide data for product to create'})
         }
 
+        // Using the Destructring Method here
+
         let { title, description, price, currencyId, currencyFormat, isFreeShipping, style, availableSizes, installments }=data
+
+        // validations
 
         if(!isValid(title)){
             return res.status(400).send({status:false,message:'please provide title of the product'})
@@ -50,28 +57,33 @@ const createProduct = async function(req,res){
             return res.status(400).send({status:false,message:'please provide curencyId of the product'})
         }
         if(currencyId!="INR"){
-            return res.status(400).send({status:false,message:'Only INR is valid for currency type'})
+            return res.status(400).send({status:false,message:'Sorry!!! Only INR is valid for currency type'})
 
         }
         if(currencyFormat!="₹"){
-            return res.status(400).send({status:false,message:'currency format should be indian rupees ₹'})
+            return res.status(400).send({status:false,message:'Sorry!!! currency format should be indian rupees ₹'})
         }
         if(!isValid(currencyFormat)){
             return res.status(400).send({status:false,message:'please provide currencyformat of the product'})
         }
+
+        // validation for available size, & for adding multiple size in the form Data
         if (availableSizes) {
           availableSizes=availableSizes.split(",")
           for(let i=0;i<availableSizes.length;i++){
           if (!["S", "XS","M","X", "L","XXL", "XL"].includes(availableSizes[i])) {
             res.status(400).send({
               status: false,
-              msg: "invalid sizes",
+              message: "Sorry!!! Please provide from the available size only",
             });
             return;
           }
         }}
+
+        // checking for the file length, which should not be equal to zero
   
-        if(!files.length>0){return res.status(400).send({status:false,msg:"please provide product image"})}
+        if(!files.length>0){
+          return res.status(400).send({status:false,msg:"please provide product image"})}
 
         productImage=await s3link.uploadFile(files[0])
         let productData = {
@@ -99,10 +111,19 @@ const createProduct = async function(req,res){
 
 }
 
+// ........................Sixth Api Get Product...........................................................
+
 const getProduct = async function(req,res){
     try {
         let query = req.query
+
+        // using Destructing method here
         let {size,name,priceGreaterThan,priceLessThan } = query
+
+        /* this empty object also called hash map will store the particular data when used
+        The Map object holds key-value pairs and remembers the original insertion order of the keys. 
+        Any value (both objects and primitive values) may be used as either a key or a value.*/
+
         const filter = { isDeleted: false }
 
         if(size){
@@ -114,7 +135,7 @@ const getProduct = async function(req,res){
 
         }
         if(priceGreaterThan){
-            filter['price'] = {$gt:priceGreaterThan}
+            filter['price'] = {$gt:priceGreaterThan} 
 
         }
         if(priceLessThan){
@@ -122,7 +143,8 @@ const getProduct = async function(req,res){
         }
         
 
-        
+        //  passing/using the map in the find query to filter/store the particular feild
+
         let getProductDetail =await productModel.find(filter)
         return res.status(200).send({status:true,messsage:'sucess',Data:getProductDetail})
         
@@ -133,11 +155,14 @@ const getProduct = async function(req,res){
 
 }
 
+// .........................Seveth Api Get Product by Id......................................................
+
 const getProductById =async function (req,res){
       
     try {
      const productId = req.params.productId
-      
+
+      //Few Validations 
   
      if(!productId){
        return res.status(400).send({status:false,message:"product id is required field"})
@@ -147,11 +172,14 @@ const getProductById =async function (req,res){
    }
    checkId = await productModel.findById({_id:productId})
   
-  if(!checkId){return res.status(404).send({status:false,msg:"no data with this id found"})}
+  if(!checkId){
+    return res.status(404).send({status:false,message:"Sorry!!! No data with this id found"})}
   console.log(checkId)
-    if(checkId.isDeleted==true){return res.status(400).send({status:false,msg:"deleted data"})}
+
+    if(checkId.isDeleted==true){
+      return res.status(400).send({status:false,message:"Sorry the said data is deleted/Not avilable"})}
   
-  res.status(200).send({status:true,msg:"sucess",data:checkId})
+  res.status(200).send({status:true,message:"Sucess",data:checkId})
       
     } catch (error) {
       return res.status(500).send({status:false,message:error.message})
@@ -159,24 +187,30 @@ const getProductById =async function (req,res){
    };
 
 
+  //  .........................Eight Api Update the Product......................................................
+
+
    const updateProduct = async function (req, res) {
     try {
       let productId = req.params.productId;
   
       if (!isValidObjectId(productId)) {
-        return res.status(400).send({ status: false, msg: "invalid objectid" });
+        return res.status(400).send({ status: false, message: "Sorry!!! the Object id is not valid" });
       }
       let checkidinDb=await productModel.findById(productId)
   
-      if(!checkidinDb){return res.status(404).send({status:false,msg:"this id is not found"})}
+      if(!checkidinDb){
+        return res.status(404).send({status:false,message:"Sorry!!! this id is not found"})}
   
       if (!checkidinDb.isDeleted == false) {
-        return res.status(404).send("This product Already Deleted");
+        return res.status(404).send("Sorry!!! This product Already Deleted");
        }
 
 
        
   let data=req.body
+
+  // Using Destructiing Method
       let {title,description,price,isFreeShipping,availableSizes,installments}=data
   
       let files=req.files
