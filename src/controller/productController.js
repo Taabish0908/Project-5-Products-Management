@@ -118,7 +118,7 @@ const getProduct = async function(req,res){
         let query = req.query
 
         // using Destructing method here
-        let {size,name,priceGreaterThan,priceLessThan } = query
+        let {size,name,priceGreaterThan,priceLessThan ,priceSort } = query
 
         /* this empty object also called hash map will store the particular data when used
         The Map object holds key-value pairs and remembers the original insertion order of the keys. 
@@ -141,11 +141,16 @@ const getProduct = async function(req,res){
         if(priceLessThan){
             filter['price'] = {$lt:priceLessThan}
         }
+        // if(priceSort){
+        //   if(priceSort == -1 || priceSort==1){
+        //     filter['priceSort'] = priceSort 
+        //   } else{return res.status(400).send({status:false,message:'provide correct priceSort values'})}
+        // }
         
 
         //  passing/using the map in the find query to filter/store the particular feild
 
-        let getProductDetail =await productModel.find(filter)
+        let getProductDetail =await productModel.find(filter).sort({price:-1})
         return res.status(200).send({status:true,messsage:'sucess',Data:getProductDetail})
         
     } catch (error) {
@@ -311,7 +316,7 @@ const getProductById =async function (req,res){
     }
   };
 
-
+// ...........................Ninth Api Delete by Id....................................................
 
 
 

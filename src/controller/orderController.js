@@ -5,6 +5,8 @@ const cartModel = require('../models/cartModel')
 const productModel = require("../models/productModel");
 
 
+//..................................Validation Function...........................................
+
 const isValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId);
 };
@@ -34,6 +36,8 @@ const isvalidStatus = function (value) {
 }
 
 
+// ...........................Fourteenth Api Order Creation....................................
+
 let createOrder = async function (req, res) {
     try {
         let userId = req.params.userId
@@ -51,6 +55,7 @@ let createOrder = async function (req, res) {
         }
 
 
+        // Using Destructring method
         let { items, totalPrice, totalItems, totalQuantity, cancellable, status, deletedAt, isDeleted } = data
 
         totalPrice = 0
@@ -118,7 +123,8 @@ let createOrder = async function (req, res) {
     catch (err) { res.status(500).send({ status: false, error: err.message }) }
 }
 
-// ===============================================================update order====================================================
+// ....................................Fifteen Api Update Order..................................
+
 const updateOrder = async function (req, res) {
     let userId = req.params.userId
     let orderId = req.body.orderId

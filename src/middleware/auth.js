@@ -3,6 +3,9 @@ const { default: mongoose } = require('mongoose')
 // const bookModel = require('../models/bookModel')
 const userModel = require('../models/userModel')
 
+
+// ....................Authentication.................................................
+
 const authenticate = async function(req, res, next){
     try{
         const token = req.header('Authorization',"Bearer Token");
@@ -28,8 +31,11 @@ const authenticate = async function(req, res, next){
     }
 }
 
+
+// ...........................Authorization..............................................
+
 const authorise = async function(req, res,next){
-    // try{
+    try{
         const userId = req.params.userId
         // const token = req.header('Authorization',"Bearer Token");
         // const decodedToken = req.decodedToken
@@ -54,9 +60,9 @@ const authorise = async function(req, res,next){
         
         next()
 
-    // }catch(err){
-    //     res.status(500).send({error : err.message})
-    // }
+    }catch(err){
+        res.status(500).send({error : err.message})
+    }
 }
 
 module.exports.authenticate = authenticate
