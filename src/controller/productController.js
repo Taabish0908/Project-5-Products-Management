@@ -47,6 +47,11 @@ const createProduct = async function(req,res){
         if(!isValid(title)){
             return res.status(400).send({status:false,message:'please provide title of the product'})
         }
+        const DuplicateTitle = await productModel.findOne({ title: title });
+        if (DuplicateTitle) {
+            return res.status(400).send({ status: false, message: "Sorry!!! This title already exists with another Product" });
+        }
+
         if(!isValid(description)){
             return res.status(400).send({status:false,message:'please provide description of the product'})
         }
@@ -222,11 +227,11 @@ const getProductById =async function (req,res){
   
       
       if(!(isValidRequestBody(data)||(files))){
-          return res.status(400).send({status:false,msg:"please give some data to update"})}
+          return res.status(400).send({status:false,message:"please give some data to update"})}
   
   
       if (!isvalidStringOnly(title)) {
-        return res.status(400).send({status:false,msg:"please give title"})
+        return res.status(400).send({status:false,message:"please give title"})
       }
       const titleAlreadyUsed = await productModel.findOne({ title:title });
       if (titleAlreadyUsed) {
@@ -235,32 +240,32 @@ const getProductById =async function (req,res){
       }
       if (!isvalidStringOnly(description)) {
   
-      return res.status(400).send({ status: false, msg: "description is required for updation" });
+      return res.status(400).send({ status: false, message: "description is required for updation" });
       
       }
   
       if (!isvalidStringOnly(price)) {
         
           
-         return res.status .send({ status: false, msg: "price is required for updation" })}
+         return res.status .send({ status: false, message: "price is required for updation" })}
   
          if(price){
           var z1 = /^[0-9]*$/;
       if (!z1.test(price)) 
-      {return res.status(400).send({status:false,msg:"price takes number only"})}
+      {return res.status(400).send({status:false,message:"price takes number only"})}
       }
       
       
       if (!isvalidStringOnly(isFreeShipping)) {
         res
           .status(400)
-          .send({ status: false, msg: "isfreeshipping is required for updation" });
+          .send({ status: false, message: "isfreeshipping is required for updation" });
         return;
       }
   
       if (!isvalidStringOnly(availableSizes)) {
   
-        return res.status(400).send({ status: false, msg: "availableSizes is required for updation" });
+        return res.status(400).send({ status: false, message: "availableSizes is required for updation" });
         
         }
   
@@ -281,14 +286,14 @@ const getProductById =async function (req,res){
   
         if (!isvalidStringOnly(installments)) {
   
-          return res.status(400).send({ status: false, msg: "installments is required for updation" });
+          return res.status(400).send({ status: false, message: "installments is required for updation" });
           
           }
   
           if(installments){
             var z1 = /^[0-9]*$/;
         if (!z1.test(installments)) 
-        {return res.status(400).send({status:false,msg:"installments takes number only"})}
+        {return res.status(400).send({status:false,message:"installments takes number only"})}
         }
       
       
@@ -310,9 +315,9 @@ const getProductById =async function (req,res){
         data,
         { new: true }
       );
-      res.status(201).send({status:false,msg:"updated sucessfully",data:updateProduct})
+      res.status(201).send({status:false,message:"updated sucessfully",data:updateProduct})
     } catch (error) {
-      res.status(500).send({ satus: false, msg: error.message });
+      res.status(500).send({ satus: false, message: error.message });
     }
   };
 
@@ -341,7 +346,7 @@ const getProductById =async function (req,res){
      
  
     const deletebyid = await productModel.findByIdAndUpdate({_id:productId},{isDeleted:true},{new:true})
-    res.status(200).send({status:false,msg:"sucess",data:deletebyid})
+    res.status(200).send({status:false,message:"sucess",data:deletebyid})
   
  
      
